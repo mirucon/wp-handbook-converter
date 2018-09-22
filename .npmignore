@@ -1,0 +1,9 @@
+.idea/
+.DS_Store
+node_modules/
+api/
+en/
+
+## Exclude possible output directory ##
+*handbook/
+*organizer/
