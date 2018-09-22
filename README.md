@@ -1,6 +1,6 @@
 # wp-handbook-converter
 
-[![Build Status](https://travis-ci.org/mirucon/wp-handbook-converter.svg?branch=master)](https://travis-ci.org/mirucon/wp-handbook-converter)
+[![Build Status](https://travis-ci.com/mirucon/wp-handbook-converter.svg?branch=master)](https://travis-ci.com/mirucon/wp-handbook-converter)
 
 ## Description
 
@@ -26,6 +26,7 @@ $ wp-handbook-converter <team>
 
 * `-b, --handbook` &lt;handbook&gt;  Specify handbook name. (Default "handbook")
 * `-s, --sub-domain` &lt;sub-domain&gt; Specify subdomain name. e.g. "developer" for developer.w.org, "w.org" for w.org (Default "make")
+* `-o, --output-dir` &lt;output-dir&gt; Specify directory to save files (default en/)
 
 ### Example
 
