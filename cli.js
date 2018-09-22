@@ -7,9 +7,11 @@ const program = require('commander')
 const mkdirp = require('mkdirp')
 const _ = require('lodash')
 const WPAPI = require('wpapi')
-
-mkdirp('en/', err => {
-  if (err) console.log(err)
+const turndown = require('turndown')
+const turndownService = new turndown({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
+  emDelimiter: '*'
 })
 
 const getAll = request => {
@@ -31,6 +33,10 @@ const generateJson = async (team, handbook, subdomain, outputDir) => {
   }.`
   outputDir = outputDir ? outputDir.replace(/\/$/, '') + '/' : 'en/'
 
+  mkdirp(`${outputDir}/`, err => {
+    if (err) console.log(err)
+  })
+
   const wp = new WPAPI({
     endpoint: `https://${subdomain}wordpress.org/${team}/wp-json`
   })
@@ -51,16 +57,20 @@ const generateJson = async (team, handbook, subdomain, outputDir) => {
       }
     }
     for (const item of allPosts) {
-      const path = item.link.split(rootPath)[1].replace(/\/$/, '')
+      const path = item.link.split(rootPath)[1].replace(/\/$/, '') || 'index'
       const filePath =
         path.split('/').length > 1
           ? path.substring(0, path.lastIndexOf('/')) + '/'
           : ''
+
+      const markdownContent = turndownService.turndown(item.content.rendered)
+      const markdown = `# ${item.title.rendered}\n\n${markdownContent}`
+
       await mkdirp(`${outputDir}/${filePath}`, err => {
         if (err) {
           console.log(err)
         } else {
-          fs.writeFile(`${outputDir}/${path}.md`, item.content, err => {
+          fs.writeFile(`${outputDir}/${path}.md`, markdown, err => {
             if (err) {
               throw err
             } else {
