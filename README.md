@@ -1,6 +1,6 @@
 # wp-handbook-converter
 
-[![Build Status](https://travis-ci.com/mirucon/wp-handbook-converter.svg?branch=master)](https://travis-ci.com/mirucon/wp-handbook-converter)
+[![Build Status](https://travis-ci.com/mirucon/wp-handbook-converter.svg?branch=master)](https://travis-ci.com/mirucon/wp-handbook-converter) [![npm version](https://badge.fury.io/js/wp-handbook-converter.svg)](https://badge.fury.io/js/wp-handbook-converter)
 
 ## Description
 
