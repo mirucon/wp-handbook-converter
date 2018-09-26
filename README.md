@@ -33,13 +33,13 @@ $ wp-handbook-converter <team>
 Get Meetup Handbook
 
 ```bash
-$ handbook-tracker community --handbook meetup-handbook
+$ wp-handbook-converter community --handbook meetup-handbook
 ```
 
 Get theme developer Handbook
 
 ```bash
-$ handbook-tracker '' --handbook theme-handbook --sub-domain developer
+$ wp-handbook-converter '' --handbook theme-handbook --sub-domain developer
 ```
 
 ### TODO
