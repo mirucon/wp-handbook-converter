@@ -1,6 +1,6 @@
 # wp-handbook-converter
 
-[![Build Status](https://travis-ci.com/mirucon/wp-handbook-converter.svg?branch=master)](https://travis-ci.com/mirucon/wp-handbook-converter)
+[![Build Status](https://travis-ci.com/mirucon/wp-handbook-converter.svg?branch=master)](https://travis-ci.com/mirucon/wp-handbook-converter) [![npm version](https://badge.fury.io/js/wp-handbook-converter.svg)](https://badge.fury.io/js/wp-handbook-converter)
 
 ## Description
 
@@ -35,13 +35,13 @@ $ wp-handbook-converter <team>
 Get Meetup Handbook
 
 ```bash
-$ handbook-tracker community --handbook meetup-handbook
+$ wp-handbook-converter community --handbook meetup-handbook
 ```
 
 Get theme developer Handbook
 
 ```bash
-$ handbook-tracker '' --handbook theme-handbook --sub-domain developer
+$ wp-handbook-converter '' --handbook theme-handbook --sub-domain developer
 ```
 
 ### TODO
