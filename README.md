@@ -16,6 +16,8 @@ $ npm i -g wp-handbook-converter
 $ yarn global add wp-handbook-converter
 ```
 
+For onetime run, just do `$ npx wp-handbook-converter <team>`
+
 ## `wp-handbook-converter` command
 
 ```bash

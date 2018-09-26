@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PhpCodeSniffer">
+    <phpcs_settings>
+      <PhpCSConfiguration max_messages_per_file="100" standards="MySource;PEAR;PSR1;PSR2;Squiz;WordPress;WordPress-Core;WordPress-Custom;WordPress-Docs;WordPress-Extra;WordPress-VIP;Zend" tool_path="phpcs" />
+    </phpcs_settings>
+  </component>
+</project>
