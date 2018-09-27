@@ -43,8 +43,3 @@ Get theme developer Handbook
 ```bash
 $ wp-handbook-converter '' --handbook theme-handbook --sub-domain developer
 ```
-
-### TODO
-
-* [ ] Support diffs to see what files are updated or created
-* [ ] Remove files no longer necessary automatically
