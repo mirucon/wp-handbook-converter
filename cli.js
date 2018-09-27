@@ -5,6 +5,7 @@
 const fs = require('fs')
 const program = require('commander')
 const mkdirp = require('mkdirp')
+const del = require('del')
 const _ = require('lodash')
 const WPAPI = require('wpapi')
 const turndown = require('turndown')
@@ -26,12 +27,24 @@ const getAll = request => {
   })
 }
 
-const generateJson = async (team, handbook, subdomain, outputDir) => {
+const generateJson = async (
+  team,
+  handbook,
+  subdomain,
+  outputDir,
+  regenerate
+) => {
   handbook = handbook ? handbook : 'handbook'
   subdomain = `${
     subdomain ? (subdomain === 'w.org' ? '' : subdomain) : 'make'
   }.`
   outputDir = outputDir ? outputDir.replace(/\/$/, '') + '/' : 'en/'
+
+  if (regenerate) {
+    // Remove the output directory first if -r option is set.
+    del([`${outputDir}`])
+      .catch(() => {})
+  }
 
   mkdirp(`${outputDir}/`, err => {
     if (err) console.log(err)
@@ -136,8 +149,18 @@ program
     '-o --output-dir <outputDir>',
     'Specify directory to save files (default en/)'
   )
+  .option(
+    '-r --regenerate',
+    'If this option is supplied, the directory you specified as output directory will once deleted, and it will regenerate all the files in the directory'
+  )
   .action((team, options) => {
-    generateJson(team, options.handbook, options.subDomain, options.outputDir)
+    generateJson(
+      team,
+      options.handbook,
+      options.subDomain,
+      options.outputDir,
+      options.regenerate
+    )
   })
 
 program.parse(process.argv)
