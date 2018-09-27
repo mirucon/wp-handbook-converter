@@ -70,13 +70,50 @@ const generateJson = async (team, handbook, subdomain, outputDir) => {
         if (err) {
           console.log(err)
         } else {
-          fs.writeFile(`${outputDir}/${path}.md`, markdown, err => {
-            if (err) {
-              throw err
-            } else {
-              console.log(`Created ${path}.md`)
-            }
-          })
+          try {
+            fs.readFile(`${outputDir}/${path}.md`, 'utf8', (err, data) => {
+              if (!data) {
+                fs.writeFile(
+                  `${outputDir}/${path}.md`,
+                  markdown,
+                  'utf8',
+                  err => {
+                    if (err) {
+                      throw err
+                    } else {
+                      console.log(`Created ${path}.md`)
+                    }
+                  }
+                )
+              } else if (data === markdown) {
+                console.log(
+                  '\x1b[37m%s\x1b[0m',
+                  `${path}.md already exists and has exactly the same content. Skipping...`
+                )
+              } else {
+                fs.writeFile(
+                  `${outputDir}/${path}.md`,
+                  'utf8',
+                  markdown,
+                  err => {
+                    if (err) {
+                      throw err
+                    } else {
+                      console.log(`Updated ${path}.md`)
+                    }
+                  }
+                )
+              }
+            })
+          } catch (e) {
+            fs.writeFile(`${outputDir}/${path}.md`, 'utf8', markdown, err => {
+              if (err) {
+                throw err
+              } else {
+                console.log(`Created ${path}.md`)
+              }
+            })
+          }
         }
       })
     }
