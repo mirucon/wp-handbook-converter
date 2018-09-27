@@ -1,8 +1,16 @@
 language: node_js
+
 node_js:
   - '8'
   - '10'
 
 cache:
   directories:
-    - 'node_modules'
+    - node_modules
+
+notifications:
+  slack:
+    secure: 'S2a/G2iusToab9UA7OtqDhoLRoF3cWmCGbYcAqCBZn971ma539YeMO6AoYZND5kWFamZLLVRHRbddjZLAHk3c29j/hEQXV8y2OQ6PnkkYAvUGJAwbhdzirEJltYdZwHo3ng2j1FXguaN7Mmw1j/vgPO5wLqFadJEnwOfCxGJbAHAUfF+cKeM6YCc9O5FKjEAEeqXeTD/pdMcy6I9AAdvBvD+31BwOxbL2Yn2fM0GPVS1ow7rPxEk/wkakTAip4kpLr4Tr1lX0WdeGPUKWJ7TJ9wgXaToga2fkUdIHTAxBGjAhWDwhE9dU6JcN7fflkfr1K5eE42dNtt5C102pIsQ3JBNyhf4wnG051wSaZmPkr8Z8n4258esedLXvvNbQn8YDBtIHyybvpnj+yFp6mcY78KIb9YOZaNa+HvydqUnXKCWq/bTgnlyvCnlv9RDJ8xOL48E1KhqBMKp/tfbvzSUj1PSPOU64KWmP5r6hJzHIpgPdwGsQCfT+Nl26rxSGWRMFrGsLQcbhepNeIdPehr8EZodulUvaojEJIduRfOerfsGVVZyiTR73y2AibcukIs7JP4bcyoVImEiUETRtIsnyVJnwqIllBJrbuaUKy9jXxkefOUDY6L/eMWVT7KPamL3yMw3meaTnWiNvhEgo0rPrGNUfPZ1mKfoyG7GZ/iho8Y='
+    on_success: never # default: change
+    on_failure: always # default: always
+  email: false
