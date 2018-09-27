@@ -42,8 +42,7 @@ const generateJson = async (
 
   if (regenerate) {
     // Remove the output directory first if -r option is set.
-    del([`${outputDir}`])
-      .catch(() => {})
+    del([`${outputDir}`]).catch(() => {})
   }
 
   mkdirp(`${outputDir}/`, err => {

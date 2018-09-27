@@ -11,7 +11,7 @@ Convert all pages in a specific type of WordPress handbook into markdown files.
 ```bash
 $ npm i -g wp-handbook-converter
 
-# Or 
+# Or
 
 $ yarn global add wp-handbook-converter
 ```
@@ -26,9 +26,9 @@ $ wp-handbook-converter <team>
 
 ### options
 
-* `-b, --handbook` &lt;handbook&gt;  Specify handbook name. (Default "handbook")
-* `-s, --sub-domain` &lt;sub-domain&gt; Specify subdomain name. e.g. "developer" for developer.w.org, "w.org" for w.org (Default "make")
-* `-o, --output-dir` &lt;output-dir&gt; Specify directory to save files (default en/)
+- `-b, --handbook` &lt;handbook&gt; Specify handbook name. (Default "handbook")
+- `-s, --sub-domain` &lt;sub-domain&gt; Specify subdomain name. e.g. "developer" for developer.w.org, "w.org" for w.org (Default "make")
+- `-o, --output-dir` &lt;output-dir&gt; Specify directory to save files (default en/)
 
 ### Example
 
@@ -40,6 +40,6 @@ $ wp-handbook-converter community --handbook meetup-handbook
 
 Get theme developer Handbook
 
-```bash
+```bash∑
 $ wp-handbook-converter '' --handbook theme-handbook --sub-domain developer
 ```
