@@ -12,19 +12,19 @@ const turndown = require('turndown')
 const turndownService = new turndown({
   headingStyle: 'atx',
   codeBlockStyle: 'fenced',
-  emDelimiter: '*'
+  emDelimiter: '*',
 })
 
-const getAll = request => {
-  return request.then(response => {
+const getAll = (request) => {
+  return request.then((response) => {
     if (!response._paging || !response._paging.next) {
       return response
     }
     // Request the next page and return both responses as one collection
     return Promise.all([
       response,
-      getAll(response._paging.next)
-    ]).then(responses => _.flatten(responses))
+      getAll(response._paging.next),
+    ]).then((responses) => _.flatten(responses))
   })
 }
 
@@ -46,12 +46,12 @@ const generateJson = async (
     del([`${outputDir}`]).catch(() => {})
   }
 
-  mkdirp(`${outputDir}/`, err => {
+  mkdirp(`${outputDir}/`, (err) => {
     if (err) console.log(err)
   })
 
   const wp = new WPAPI({
-    endpoint: `https://${subdomain}wordpress.org/${team}/wp-json`
+    endpoint: `https://${subdomain}wordpress.org/${team}/wp-json`,
   })
   wp.handbooks = wp.registerRoute('wp/v2', `/${handbook}/(?P<id>)`)
 
@@ -59,7 +59,7 @@ const generateJson = async (
     `Connecting to https://${subdomain}wordpress.org/${team}/wp-json/wp/v2/${handbook}/`
   )
 
-  getAll(wp.handbooks()).then(async allPosts => {
+  getAll(wp.handbooks()).then(async (allPosts) => {
     let rootPath = ''
     for (const item of allPosts) {
       if (parseInt(item.parent) === 0) {
@@ -79,7 +79,7 @@ const generateJson = async (
       const markdownContent = turndownService.turndown(item.content.rendered)
       const markdown = `# ${item.title.rendered}\n\n${markdownContent}`
 
-      await mkdirp(`${outputDir}/${filePath}`, err => {
+      await mkdirp(`${outputDir}/${filePath}`, (err) => {
         if (err) {
           console.log(err)
         } else {
@@ -90,7 +90,7 @@ const generateJson = async (
                   `${outputDir}/${path}.md`,
                   markdown,
                   'utf8',
-                  err => {
+                  (err) => {
                     if (err) {
                       throw err
                     } else {
@@ -108,7 +108,7 @@ const generateJson = async (
                   `${outputDir}/${path}.md`,
                   'utf8',
                   markdown,
-                  err => {
+                  (err) => {
                     if (err) {
                       throw err
                     } else {
@@ -119,7 +119,7 @@ const generateJson = async (
               }
             })
           } catch (e) {
-            fs.writeFile(`${outputDir}/${path}.md`, 'utf8', markdown, err => {
+            fs.writeFile(`${outputDir}/${path}.md`, 'utf8', markdown, (err) => {
               if (err) {
                 throw err
               } else {
