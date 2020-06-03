@@ -2,6 +2,7 @@
 
 'use strict'
 
+const packageJson = require('./package.json')
 const fs = require('fs')
 const program = require('commander')
 const mkdirp = require('mkdirp')
@@ -46,9 +47,18 @@ const generateJson = async (
     del([`${outputDir}`]).catch(() => {})
   }
 
-  mkdirp(`${outputDir}/`, (err) => {
-    if (err) console.log(err)
-  })
+  await mkdirp(`${outputDir}/`)
+    .then((made) => {
+      if (made) {
+        console.log(`Created directory ${made}`)
+      }
+    })
+    .catch((e) => {
+      console.error(
+        'Could not create output directory. Make sure you have right permission on the directory and try again.'
+      )
+      throw e
+    })
 
   const wp = new WPAPI({
     endpoint: `https://${subdomain}wordpress.org/${team}/wp-json`,
@@ -60,6 +70,11 @@ const generateJson = async (
   )
 
   getAll(wp.handbooks()).then(async (allPosts) => {
+    if (allPosts.length === 0) {
+      console.warn('No posts found.')
+      process.exit(1)
+    }
+
     let rootPath = ''
     for (const item of allPosts) {
       if (parseInt(item.parent) === 0) {
@@ -79,10 +94,8 @@ const generateJson = async (
       const markdownContent = turndownService.turndown(item.content.rendered)
       const markdown = `# ${item.title.rendered}\n\n${markdownContent}`
 
-      await mkdirp(`${outputDir}/${filePath}`, (err) => {
-        if (err) {
-          console.log(err)
-        } else {
+      await mkdirp(`${outputDir}/${filePath}`)
+        .then((_) => {
           try {
             fs.readFile(`${outputDir}/${path}.md`, 'utf8', (err, data) => {
               if (!data) {
@@ -127,14 +140,19 @@ const generateJson = async (
               }
             })
           }
-        }
-      })
+        })
+        .catch((e) => {
+          console.error(
+            'An error occurred during saving files. Please try again.'
+          )
+          throw e
+        })
     }
   })
 }
 
 program
-  .version('1.0.0')
+  .version(packageJson.version)
   .arguments('<team>')
   .description('Generate a menu JSON file for WordPress.org handbook')
   .option(
