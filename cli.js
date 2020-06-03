@@ -4,7 +4,7 @@
 
 const packageJson = require('./package.json')
 const fs = require('fs')
-const program = require('commander')
+const { program } = require('commander')
 const mkdirp = require('mkdirp')
 const del = require('del')
 const _ = require('lodash')
