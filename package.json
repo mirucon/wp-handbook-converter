@@ -12,7 +12,7 @@
     "test": "prettier --list-different cli.js"
   },
   "dependencies": {
-    "commander": "^5.0.0",
+    "commander": "^6.0.0",
     "del": "^6.0.0",
     "lodash": "^4.17.11",
     "mkdirp": "^1.0.0",
