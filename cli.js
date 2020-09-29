@@ -90,8 +90,12 @@ const generateJson = async (
         path.split('/').length > 1
           ? path.substring(0, path.lastIndexOf('/')) + '/'
           : ''
-
-      const markdownContent = turndownService.turndown(item.content.rendered)
+      // remove <span class='glossary-item-hidden-content'>inner contents
+      const preContent = item.content.rendered.replace(
+        /<span class=\'glossary-item-hidden-content\'>.*?<\/span><\/span>/g,
+        ''
+      )
+      const markdownContent = turndownService.turndown(preContent)
       const markdown = `# ${item.title.rendered}\n\n${markdownContent}`
 
       await mkdirp(`${outputDir}/${filePath}`)
