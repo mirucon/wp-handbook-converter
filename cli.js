@@ -7,7 +7,6 @@ const fs = require('fs')
 const { program } = require('commander')
 const mkdirp = require('mkdirp')
 const del = require('del')
-const _ = require('lodash')
 const WPAPI = require('wpapi')
 const turndown = require('turndown')
 const turndownService = new turndown({
@@ -25,7 +24,7 @@ const getAll = (request) => {
     return Promise.all([
       response,
       getAll(response._paging.next),
-    ]).then((responses) => _.flatten(responses))
+    ]).then((responses) => responses.flat())
   })
 }
 
@@ -118,7 +117,7 @@ const generateJson = async (
               } else if (data === markdown) {
                 console.log(
                   '\x1b[37m%s\x1b[0m',
-                  `${path}.md already exists and has exactly the same content. Skipping...`
+                  `${path}.md already exists with the exact same content. Skipping...`
                 )
               } else {
                 fs.writeFile(

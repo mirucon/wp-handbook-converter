@@ -16,7 +16,7 @@ $ npm i -g wp-handbook-converter
 $ yarn global add wp-handbook-converter
 ```
 
-For onetime run, just do `$ npx wp-handbook-converter <team>`
+If you want to run the command without installing the package, use this: `$ npx wp-handbook-converter <team>`
 
 ## `wp-handbook-converter` command
 
@@ -28,7 +28,7 @@ $ wp-handbook-converter <team>
 
 - `-b, --handbook` &lt;handbook&gt; Specify handbook name. (Default "handbook")
 - `-s, --sub-domain` &lt;sub-domain&gt; Specify subdomain name. e.g. "developer" for developer.w.org, "w.org" for w.org (Default "make")
-- `-o, --output-dir` &lt;output-dir&gt; Specify directory to save files (default en/)
+- `-o, --output-dir` &lt;output-dir&gt; Specify the directory to save files (default `en/`)
 
 ### Example
 
