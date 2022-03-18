@@ -1,4 +1,3 @@
-  
 {
   "extends": [
     "config:base",
@@ -12,6 +11,13 @@
   ],
   "timezone": "Asia/Tokyo",
   "schedule": [
-    "before 7am on Saturday"
-  ]
+    "on the 2nd and 4th day instance on Saturday before 7am"
+  ],
+  "lockFileMaintenance": {
+    "enabled": true,
+    "automerge": true,
+    "schedule": [
+      "on the 2nd and 4th day instance on Saturday before 7am"
+    ]
+  }
 }
