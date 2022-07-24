@@ -16,30 +16,38 @@ $ npm i -g wp-handbook-converter
 $ yarn global add wp-handbook-converter
 ```
 
-If you want to run the command without installing the package, use this: `$ npx wp-handbook-converter <team>`
+If you want to run the command without installing the package, use this: `$ npx wp-handbook-converter`
 
-## `wp-handbook-converter` command
+## `wp-handbook-converter` command options
 
-```bash
-$ wp-handbook-converter <team>
-```
-
-### options
-
+- `-t, --team` &lt;team&gt; Specify team name.
 - `-b, --handbook` &lt;handbook&gt; Specify handbook name. (Default "handbook")
 - `-s, --sub-domain` &lt;sub-domain&gt; Specify subdomain name. e.g. "developer" for developer.w.org, "w.org" for w.org (Default "make")
 - `-o, --output-dir` &lt;output-dir&gt; Specify the directory to save files (default `en/`)
+- `-r, --regenerate` &lt;regenerate&gt; If this option is supplied, the directory you specified as output directory will once deleted, and it will regenerate all the files in the directory
 
 ### Example
 
-Get Meetup Handbook
+Get Core Contributor Handbook
 
 ```bash
-$ wp-handbook-converter community --handbook meetup-handbook
+$ wp-handbook-converter --team core
 ```
 
-Get theme developer Handbook
+Get Meetup Organizer Handbook
 
-```bash∑
-$ wp-handbook-converter '' --handbook theme-handbook --sub-domain developer
+```bash
+$ wp-handbook-converter --team community --handbook meetup-handbook
+```
+
+Get theme Handbook
+
+```bash
+$ wp-handbook-converter --handbook theme-handbook --sub-domain developer
+```
+
+Get plugin Handbook
+
+```bash
+$ wp-handbook-converter --handbook plugin-handbook --sub-domain developer
 ```
