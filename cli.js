@@ -9,7 +9,7 @@ const mkdirp = require('mkdirp')
 const del = require('del')
 const WPAPI = require('wpapi')
 const TurndownService = require('turndown')
-const {tables}  = require('turndown-plugin-gfm')
+const { tables } = require('turndown-plugin-gfm')
 
 // Languages that can be specified in the code markdown
 const codeLanguages = {
@@ -44,61 +44,68 @@ const turndownService = new TurndownService({
   codeBlockStyle: 'fenced',
   emDelimiter: '*',
 })
-turndownService.use(tables);
+turndownService.use(tables)
 
 // Remove Glossary
 turndownService.addRule('glossary', {
-  filter: node => {
-    const classList = node.getAttribute('class');
-    if ( classList ) {
-      return classList === 'glossary-item-hidden-content';
+  filter: (node) => {
+    const classList = node.getAttribute('class')
+    if (classList) {
+      return classList === 'glossary-item-hidden-content'
     }
-    return false;
+    return false
   },
   replacement: () => {
-    return '';
-  }
-});
+    return ''
+  },
+})
 
 // Remove code trigger anchor
 turndownService.addRule('code-trigger-anchor', {
-  filter: node => {
-    const classList = node.getAttribute('class');
-    if ( classList ) {
-      return classList.includes('show-complete-source') || classList.includes(`less-complete-source`);
+  filter: (node) => {
+    const classList = node.getAttribute('class')
+    if (classList) {
+      return (
+        classList.includes('show-complete-source') ||
+        classList.includes(`less-complete-source`)
+      )
     }
-    return false;
+    return false
   },
   replacement: () => {
-    return '';
-  }
-});
+    return ''
+  },
+})
 
 // Transform dt tag to strong tag
 turndownService.addRule('dt-to-strong', {
   filter: ['dt'],
   replacement: (content, node, options) => {
     return options.strongDelimiter + content + options.strongDelimiter
-  }
-});
+  },
+})
 
 // Transform pre code block to code markdown
 turndownService.addRule('precode to code', {
-  filter: node => {
-    const classList = node.getAttribute('class');
-    const isCode = node.nodeName === 'PRE' && classList && classList.includes('brush:');
-    return isCode;
+  filter: (node) => {
+    const classList = node.getAttribute('class')
+    const isCode =
+      node.nodeName === 'PRE' && classList && classList.includes('brush:')
+    return isCode
   },
   replacement: (content, node) => {
-    const classList = node.getAttribute('class');
+    const classList = node.getAttribute('class')
 
     // Search for a language that matches the list of code languages
-    const codeLanguage = Object.keys(codeLanguages).reduce((currentLanguage, language) => {
-      if ( classList.includes(language) ) {
-        return codeLanguages[language];
-      }
-      return currentLanguage;
-    }, undefined);
+    const codeLanguage = Object.keys(codeLanguages).reduce(
+      (currentLanguage, language) => {
+        if (classList.includes(language)) {
+          return codeLanguages[language]
+        }
+        return currentLanguage
+      },
+      undefined
+    )
 
     // Unescape contents
     let newContent = unEscapes.reduce((accumulator, unEscape) => {
@@ -106,17 +113,17 @@ turndownService.addRule('precode to code', {
     }, content)
 
     // Remove br tag
-    newContent = newContent.replace(/^<br \/>\n\n|<br \/>\n/g, "\n");
+    newContent = newContent.replace(/^<br \/>\n\n|<br \/>\n/g, '\n')
     // Remove first and last paragraph tag
-    newContent = newContent.replace(/^<\/p>|<p>$/g, '');
+    newContent = newContent.replace(/^<\/p>|<p>$/g, '')
     // Remove first new line
-    newContent = newContent.replace(/^\n/, '');
+    newContent = newContent.replace(/^\n/, '')
     // Convert to language-aware markdown
-    newContent = '```' + (codeLanguage ?? '') + "\n" + newContent + '```';
+    newContent = '```' + (codeLanguage ?? '') + '\n' + newContent + '```'
 
-    return newContent;
-  }
-});
+    return newContent
+  },
+})
 
 const getAll = (request) => {
   return request.then((response) => {
@@ -124,10 +131,9 @@ const getAll = (request) => {
       return response
     }
     // Request the next page and return both responses as one collection
-    return Promise.all([
-      response,
-      getAll(response._paging.next),
-    ]).then((responses) => responses.flat())
+    return Promise.all([response, getAll(response._paging.next)]).then(
+      (responses) => responses.flat()
+    )
   })
 }
 
@@ -167,7 +173,6 @@ const generateJson = async (
     endpoint: `https://${subdomain}wordpress.org/${team}wp-json`,
   })
 
-
   wp.handbooks = wp.registerRoute('wp/v2', `/${handbook}/(?P<id>)`)
 
   console.log(
@@ -197,7 +202,7 @@ const generateJson = async (
           ? path.substring(0, path.lastIndexOf('/')) + '/'
           : ''
 
-      const content = item.content.rendered;
+      const content = item.content.rendered
       const markdownContent = turndownService.turndown(content)
       const markdown = `# ${item.title.rendered}\n\n${markdownContent}`
 
@@ -261,10 +266,7 @@ const generateJson = async (
 program
   .version(packageJson.version)
   .description('Generate a menu JSON file for WordPress.org handbook')
-  .option(
-    '-t, --team <team>',
-    'Specify team name'
-  )
+  .option('-t, --team <team>', 'Specify team name')
   .option(
     '-b, --handbook <handbook>',
     'Specify handbook name (default "handbook")'
