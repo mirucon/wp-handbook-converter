@@ -21,10 +21,9 @@ const getAll = (request) => {
       return response
     }
     // Request the next page and return both responses as one collection
-    return Promise.all([
-      response,
-      getAll(response._paging.next),
-    ]).then((responses) => responses.flat())
+    return Promise.all([response, getAll(response._paging.next)]).then(
+      (responses) => responses.flat()
+    )
   })
 }
 
