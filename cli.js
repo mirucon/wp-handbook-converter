@@ -112,7 +112,7 @@ turndownService.addRule('precode to code', {
     // Remove first new line
     newContent = newContent.replace(/^\n/, '');
     // Convert to language-aware markdown
-    newContent = codeLanguage ? `\`\`\`${codeLanguage}\n` + newContent + '```' : "```\n" + newContent + '```';
+    newContent = '```' + (codeLanguage ?? '') + "\n" + newContent + '```';
 
     return newContent;
   }
