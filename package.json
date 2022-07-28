@@ -1,6 +1,6 @@
 {
   "name": "wp-handbook-converter",
-  "version": "0.5.0",
+  "version": "1.0.0",
   "description": "Convert all WordPress handbook content into markdown files",
   "type": "module",
   "exports": "./main.js",
