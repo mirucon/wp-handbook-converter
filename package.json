@@ -2,7 +2,11 @@
   "name": "wp-handbook-converter",
   "version": "0.5.0",
   "description": "Convert all WordPress handbook content into markdown files",
-  "main": "cli.js",
+  "type": "module",
+  "exports": "./main.js",
+  "engines": {
+    "node": ">=14.16"
+  },
   "repository": "https://github.com/mirucon/wp-handbook-converter",
   "author": "Toshihiro Kanai <i@miruc.co>",
   "license": "MIT",
@@ -12,8 +16,8 @@
     "test": "prettier --list-different cli.js"
   },
   "dependencies": {
-    "commander": "^6.0.0",
-    "del": "^6.0.0",
+    "commander": "^9.4.0",
+    "del": "^7.0.0",
     "mkdirp": "^1.0.0",
     "turndown": "^7.0.0",
     "turndown-plugin-gfm": "^1.0.2",

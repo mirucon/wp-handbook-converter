@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 
-'use strict'
-
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
 const packageJson = require('./package.json')
-const fs = require('fs')
-const { program } = require('commander')
-const mkdirp = require('mkdirp')
-const del = require('del')
-const WPAPI = require('wpapi')
-const TurndownService = require('turndown')
-const { tables } = require('turndown-plugin-gfm')
+import fs from 'fs'
+import { program } from 'commander'
+import TurndownService from 'turndown'
+import mkdirp from 'mkdirp'
+import { deleteAsync } from 'del'
+import WPAPI from 'wpapi'
+import { tables } from 'turndown-plugin-gfm'
 
 // Languages that can be specified in the code markdown
 const codeLanguages = {
@@ -89,9 +89,7 @@ turndownService.addRule('dt-to-strong', {
 turndownService.addRule('precode to code', {
   filter: (node) => {
     const classList = node.getAttribute('class')
-    const isCode =
-      node.nodeName === 'PRE' && classList && classList.includes('brush:')
-    return isCode
+    return node.nodeName === 'PRE' && classList && classList.includes('brush:')
   },
   replacement: (content, node) => {
     const classList = node.getAttribute('class')
@@ -153,7 +151,7 @@ const generateJson = async (
 
   if (regenerate) {
     // Remove the output directory first if -r option is set.
-    del([`${outputDir}`]).catch(() => {})
+    await deleteAsync([`${outputDir}`]).catch(() => {})
   }
 
   await mkdirp(`${outputDir}/`)
@@ -178,7 +176,6 @@ const generateJson = async (
   console.log(
     `Connecting to https://${subdomain}wordpress.org/${team}wp-json/wp/v2/${handbook}/`
   )
-
   getAll(wp.handbooks()).then(async (allPosts) => {
     if (allPosts.length === 0) {
       console.warn('No posts found.')
@@ -214,7 +211,7 @@ const generateJson = async (
                 fs.writeFile(
                   `${outputDir}/${path}.md`,
                   markdown,
-                  'utf8',
+                  { encoding: 'utf8' },
                   (err) => {
                     if (err) {
                       throw err
@@ -231,8 +228,8 @@ const generateJson = async (
               } else {
                 fs.writeFile(
                   `${outputDir}/${path}.md`,
-                  'utf8',
                   markdown,
+                  { encoding: 'utf8' },
                   (err) => {
                     if (err) {
                       throw err
@@ -244,13 +241,18 @@ const generateJson = async (
               }
             })
           } catch (e) {
-            fs.writeFile(`${outputDir}/${path}.md`, 'utf8', markdown, (err) => {
-              if (err) {
-                throw err
-              } else {
-                console.log(`Created ${path}.md`)
+            fs.writeFile(
+              `${outputDir}/${path}.md`,
+              markdown,
+              { encoding: 'utf8' },
+              (err) => {
+                if (err) {
+                  throw err
+                } else {
+                  console.log(`Created ${path}.md`)
+                }
               }
-            })
+            )
           }
         })
         .catch((e) => {
