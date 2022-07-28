@@ -260,6 +260,7 @@ const generateJson = async (
 
 program
   .version(packageJson.version)
+  .description('Generate a menu JSON file for WordPress.org handbook')
   .option(
     '-t, --team <team>',
     'Specify team name'
