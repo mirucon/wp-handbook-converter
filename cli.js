@@ -92,7 +92,7 @@ turndownService.addRule('precode to code', {
   replacement: (content, node) => {
     const classList = node.getAttribute('class');
 
-    // Search for a language that is match the list of code languages
+    // Search for a language that matches the list of code languages
     const codeLanguage = Object.keys(codeLanguages).reduce((currentLanguage, language) => {
       if ( classList.includes(language) ) {
         return codeLanguages[language];
