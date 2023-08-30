@@ -6,7 +6,7 @@ const packageJson = require('./package.json')
 import fs from 'fs'
 import { program } from 'commander'
 import TurndownService from 'turndown'
-import mkdirp from 'mkdirp'
+import { mkdirp } from 'mkdirp'
 import { deleteAsync } from 'del'
 import WPAPI from 'wpapi'
 import { tables } from 'turndown-plugin-gfm'
