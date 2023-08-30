@@ -102,7 +102,7 @@ turndownService.addRule('precode to code', {
         }
         return currentLanguage
       },
-      undefined
+      undefined,
     )
 
     // Unescape contents
@@ -130,7 +130,7 @@ const getAll = (request) => {
     }
     // Request the next page and return both responses as one collection
     return Promise.all([response, getAll(response._paging.next)]).then(
-      (responses) => responses.flat()
+      (responses) => responses.flat(),
     )
   })
 }
@@ -140,7 +140,7 @@ const generateJson = async (
   handbook,
   subdomain,
   outputDir,
-  regenerate
+  regenerate,
 ) => {
   team = team ? `${team}/` : ''
   handbook = handbook ? handbook : 'handbook'
@@ -162,7 +162,7 @@ const generateJson = async (
     })
     .catch((e) => {
       console.error(
-        'Could not create output directory. Make sure you have right permission on the directory and try again.'
+        'Could not create output directory. Make sure you have right permission on the directory and try again.',
       )
       throw e
     })
@@ -174,7 +174,7 @@ const generateJson = async (
   wp.handbooks = wp.registerRoute('wp/v2', `/${handbook}/(?P<id>)`)
 
   console.log(
-    `Connecting to https://${subdomain}wordpress.org/${team}wp-json/wp/v2/${handbook}/`
+    `Connecting to https://${subdomain}wordpress.org/${team}wp-json/wp/v2/${handbook}/`,
   )
   getAll(wp.handbooks()).then(async (allPosts) => {
     if (allPosts.length === 0) {
@@ -218,12 +218,12 @@ const generateJson = async (
                     } else {
                       console.log(`Created ${path}.md`)
                     }
-                  }
+                  },
                 )
               } else if (data === markdown) {
                 console.log(
                   '\x1b[37m%s\x1b[0m',
-                  `${path}.md already exists with the exact same content. Skipping...`
+                  `${path}.md already exists with the exact same content. Skipping...`,
                 )
               } else {
                 fs.writeFile(
@@ -236,7 +236,7 @@ const generateJson = async (
                     } else {
                       console.log(`Updated ${path}.md`)
                     }
-                  }
+                  },
                 )
               }
             })
@@ -251,13 +251,13 @@ const generateJson = async (
                 } else {
                   console.log(`Created ${path}.md`)
                 }
-              }
+              },
             )
           }
         })
         .catch((e) => {
           console.error(
-            'An error occurred during saving files. Please try again.'
+            'An error occurred during saving files. Please try again.',
           )
           throw e
         })
@@ -271,19 +271,19 @@ program
   .option('-t, --team <team>', 'Specify team name')
   .option(
     '-b, --handbook <handbook>',
-    'Specify handbook name (default "handbook")'
+    'Specify handbook name (default "handbook")',
   )
   .option(
     '-s, --sub-domain <subdomain>',
-    'Specify subdomain, for example, "developer" for developer.w.org, "w.org" for w.org (default "make")'
+    'Specify subdomain, for example, "developer" for developer.w.org, "w.org" for w.org (default "make")',
   )
   .option(
     '-o --output-dir <outputDir>',
-    'Specify directory to save files (default en/)'
+    'Specify directory to save files (default en/)',
   )
   .option(
     '-r --regenerate',
-    'If this option is supplied, the directory you specified as output directory will once deleted, and it will regenerate all the files in the directory'
+    'If this option is supplied, the directory you specified as output directory will once deleted, and it will regenerate all the files in the directory',
   )
   .action((options) => {
     generateJson(
@@ -291,7 +291,7 @@ program
       options.handbook,
       options.subDomain,
       options.outputDir,
-      options.regenerate
+      options.regenerate,
     )
   })
 
