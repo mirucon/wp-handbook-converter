@@ -16,7 +16,7 @@
     "test": "prettier --list-different cli.js"
   },
   "dependencies": {
-    "commander": "^9.4.0",
+    "commander": "^13.0.0",
     "del": "^7.0.0",
     "mkdirp": "^3.0.0",
     "turndown": "^7.0.0",
