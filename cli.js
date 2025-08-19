@@ -1,15 +1,13 @@
 #!/usr/bin/env node
 
+import { readFile, writeFile, mkdir, rm } from 'fs/promises'
+import { program } from 'commander'
+import TurndownService from 'turndown'
+import WPAPI from 'wpapi'
+import { tables } from 'turndown-plugin-gfm'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 const packageJson = require('./package.json')
-import fs from 'fs'
-import { program } from 'commander'
-import TurndownService from 'turndown'
-import { mkdirp } from 'mkdirp'
-import { deleteAsync } from 'del'
-import WPAPI from 'wpapi'
-import { tables } from 'turndown-plugin-gfm'
 
 // Languages that can be specified in the code markdown
 const codeLanguages = {
@@ -123,19 +121,15 @@ turndownService.addRule('precode to code', {
   },
 })
 
-const getAll = (request) => {
-  return request.then((response) => {
-    if (!response._paging || !response._paging.next) {
-      return response
-    }
-    // Request the next page and return both responses as one collection
-    return Promise.all([response, getAll(response._paging.next)]).then(
-      (responses) => responses.flat(),
-    )
-  })
+const getAll = async (request) => {
+  let response = await request
+  while (response._paging && response._paging.next) {
+    response = response.concat(await response._paging.next)
+  }
+  return response
 }
 
-const generateJson = async (
+export const generateFiles = async (
   team,
   handbook,
   subdomain,
@@ -151,21 +145,18 @@ const generateJson = async (
 
   if (regenerate) {
     // Remove the output directory first if -r option is set.
-    await deleteAsync([`${outputDir}`]).catch(() => {})
+    await rm(outputDir, { recursive: true, force: true })
   }
 
-  await mkdirp(`${outputDir}/`)
-    .then((made) => {
-      if (made) {
-        console.log(`Created directory ${made}`)
-      }
-    })
-    .catch((e) => {
-      console.error(
-        'Could not create output directory. Make sure you have right permission on the directory and try again.',
-      )
-      throw e
-    })
+  try {
+    await mkdir(outputDir, { recursive: true })
+    console.log(`Created directory ${outputDir}`)
+  } catch (e) {
+    console.error(
+      'Could not create output directory. Make sure you have right permission on the directory and try again.',
+    )
+    throw e
+  }
 
   const wp = new WPAPI({
     endpoint: `https://${subdomain}wordpress.org/${team}wp-json`,
@@ -176,93 +167,63 @@ const generateJson = async (
   console.log(
     `Connecting to https://${subdomain}wordpress.org/${team}wp-json/wp/v2/${handbook}/`,
   )
-  getAll(wp.handbooks()).then(async (allPosts) => {
-    if (allPosts.length === 0) {
-      console.warn('No posts found.')
-      process.exit(1)
-    }
 
-    let rootPath = ''
-    for (const item of allPosts) {
-      if (parseInt(item.parent) === 0) {
-        rootPath = item.link.split(item.slug)[0]
-        break
+  const allPosts = await getAll(wp.handbooks())
+
+  if (allPosts.length === 0) {
+    console.warn('No posts found.')
+    process.exit(1)
+  }
+
+  let rootPath = ''
+  for (const item of allPosts) {
+    if (parseInt(item.parent) === 0) {
+      rootPath = item.link.split(item.slug)[0]
+      break
+    } else {
+      rootPath = `https://${subdomain}wordpress.org/${team}/${handbook}/`
+    }
+  }
+
+  for (const item of allPosts) {
+    const path = item.link.split(rootPath)[1].replace(/\/$/, '') || 'index'
+    const filePath =
+      path.split('/').length > 1
+        ? path.substring(0, path.lastIndexOf('/')) + '/'
+        : ''
+
+    const content = item.content.rendered
+    const markdownContent = turndownService.turndown(content)
+    const markdown = `# ${item.title.rendered}\n\n${markdownContent}`
+
+    try {
+      await mkdir(`${outputDir}/${filePath}`, { recursive: true })
+      const existingContent = await readFile(`${outputDir}/${path}.md`, 'utf8')
+      if (existingContent === markdown) {
+        console.log(
+          '\x1b[37m%s\x1b[0m',
+          `${path}.md already exists with the exact same content. Skipping...`,
+        )
       } else {
-        rootPath = `https://${subdomain}wordpress.org/${team}/${handbook}/`
+        await writeFile(`${outputDir}/${path}.md`, markdown, {
+          encoding: 'utf8',
+        })
+        console.log(`Updated ${path}.md`)
+      }
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        await writeFile(`${outputDir}/${path}.md`, markdown, {
+          encoding: 'utf8',
+        })
+        console.log(`Created ${path}.md`)
+      } else {
+        console.error(
+          'An error occurred during saving files. Please try again.',
+        )
+        throw e
       }
     }
-
-    for (const item of allPosts) {
-      const path = item.link.split(rootPath)[1].replace(/\/$/, '') || 'index'
-      const filePath =
-        path.split('/').length > 1
-          ? path.substring(0, path.lastIndexOf('/')) + '/'
-          : ''
-
-      const content = item.content.rendered
-      const markdownContent = turndownService.turndown(content)
-      const markdown = `# ${item.title.rendered}\n\n${markdownContent}`
-
-      await mkdirp(`${outputDir}/${filePath}`)
-        .then((_) => {
-          try {
-            fs.readFile(`${outputDir}/${path}.md`, 'utf8', (err, data) => {
-              if (!data) {
-                fs.writeFile(
-                  `${outputDir}/${path}.md`,
-                  markdown,
-                  { encoding: 'utf8' },
-                  (err) => {
-                    if (err) {
-                      throw err
-                    } else {
-                      console.log(`Created ${path}.md`)
-                    }
-                  },
-                )
-              } else if (data === markdown) {
-                console.log(
-                  '\x1b[37m%s\x1b[0m',
-                  `${path}.md already exists with the exact same content. Skipping...`,
-                )
-              } else {
-                fs.writeFile(
-                  `${outputDir}/${path}.md`,
-                  markdown,
-                  { encoding: 'utf8' },
-                  (err) => {
-                    if (err) {
-                      throw err
-                    } else {
-                      console.log(`Updated ${path}.md`)
-                    }
-                  },
-                )
-              }
-            })
-          } catch (e) {
-            fs.writeFile(
-              `${outputDir}/${path}.md`,
-              markdown,
-              { encoding: 'utf8' },
-              (err) => {
-                if (err) {
-                  throw err
-                } else {
-                  console.log(`Created ${path}.md`)
-                }
-              },
-            )
-          }
-        })
-        .catch((e) => {
-          console.error(
-            'An error occurred during saving files. Please try again.',
-          )
-          throw e
-        })
-    }
-  })
+  }
 }
 
 program
@@ -287,7 +248,7 @@ program
   )
   .allowExcessArguments()
   .action((options) => {
-    generateJson(
+    generateFiles(
       options.team,
       options.handbook,
       options.subDomain,
