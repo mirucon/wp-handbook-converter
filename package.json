@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "commander": "^12.1.0",
-    "del": "^7.0.0",
+    "del": "^8.0.0",
     "mkdirp": "^3.0.0",
     "turndown": "^7.0.0",
     "turndown-plugin-gfm": "^1.0.2",
