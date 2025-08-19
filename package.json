@@ -12,7 +12,6 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "lint:fix": "prettier --write *.js",
     "lint": "prettier --check .",
     "lint:fix": "prettier --write ."
   },
