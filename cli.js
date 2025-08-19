@@ -285,6 +285,7 @@ program
     '-r --regenerate',
     'If this option is supplied, the directory you specified as output directory will once deleted, and it will regenerate all the files in the directory',
   )
+  .allowExcessArguments()
   .action((options) => {
     generateJson(
       options.team,
