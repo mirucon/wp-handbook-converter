@@ -1,6 +1,6 @@
 # wp-handbook-converter
 
-[![Build Status](https://travis-ci.com/mirucon/wp-handbook-converter.svg?branch=master)](https://travis-ci.com/mirucon/wp-handbook-converter) [![npm version](https://badge.fury.io/js/wp-handbook-converter.svg)](https://badge.fury.io/js/wp-handbook-converter)
+[![npm version](https://badge.fury.io/js/wp-handbook-converter.svg)](https://badge.fury.io/js/wp-handbook-converter)
 
 ## Description
 
@@ -10,10 +10,6 @@ Convert all pages in a specific type of WordPress handbook into markdown files.
 
 ```bash
 $ npm i -g wp-handbook-converter
-
-# Or
-
-$ yarn global add wp-handbook-converter
 ```
 
 If you want to run the command without installing the package, use this: `$ npx wp-handbook-converter`
@@ -50,4 +46,20 @@ Get plugin Handbook
 
 ```bash
 $ wp-handbook-converter --handbook plugin-handbook --sub-domain developer
+```
+
+## Development
+
+### Linting
+
+This project uses [Prettier](https://prettier.io/) for code formatting. You can check for linting errors by running:
+
+```bash
+npm run lint
+```
+
+You can automatically fix linting errors by running:
+
+```bash
+npm run lint:fix
 ```

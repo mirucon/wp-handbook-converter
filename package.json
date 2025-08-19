@@ -5,7 +5,7 @@
   "type": "module",
   "exports": "./main.js",
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "repository": "https://github.com/mirucon/wp-handbook-converter",
   "author": "Toshihiro Kanai <i@miruc.co>",
@@ -13,15 +13,14 @@
   "private": false,
   "scripts": {
     "lint:fix": "prettier --write *.js",
-    "test": "prettier --list-different cli.js"
+    "lint": "prettier --check .",
+    "lint:fix": "prettier --write ."
   },
   "dependencies": {
-    "commander": "^12.1.0",
-    "del": "^7.0.0",
-    "mkdirp": "^3.0.0",
-    "turndown": "^7.0.0",
+    "commander": "^14.0.0",
+    "turndown": "^7.2.0",
     "turndown-plugin-gfm": "^1.0.2",
-    "wpapi": "^1.1.2"
+    "wpapi": "^1.2.2"
   },
   "devDependencies": {
     "prettier": "3.6.2"
