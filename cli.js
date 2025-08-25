@@ -175,18 +175,21 @@ export const generateFiles = async (
     process.exit(1)
   }
 
-  let rootPath = ''
-  for (const item of allPosts) {
-    if (parseInt(item.parent) === 0) {
-      rootPath = item.link.split(item.slug)[0]
-      break
-    } else {
-      rootPath = `https://${subdomain}wordpress.org/${team}/${handbook}/`
-    }
+  const rootItem = allPosts.find((item) => parseInt(item.parent) === 0)
+  let rootPath
+  if (rootItem && rootItem.link && rootItem.slug) {
+    rootPath = rootItem.link.split(rootItem.slug)[0]
+  } else {
+    rootPath = `https://${subdomain}wordpress.org/${team}${handbook}/`
   }
 
   for (const item of allPosts) {
-    const path = item.link.split(rootPath)[1].replace(/\/$/, '') || 'index'
+    const pathSegment = item.link.split(rootPath)[1]
+    const path =
+      (pathSegment === undefined ? item.slug : pathSegment).replace(
+        /\/$/,
+        '',
+      ) || 'index'
     const filePath =
       path.split('/').length > 1
         ? path.substring(0, path.lastIndexOf('/')) + '/'
