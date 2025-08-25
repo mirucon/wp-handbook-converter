@@ -28,3 +28,26 @@ jobs:
 
       - name: lint
         run: npm run lint
+
+  Test:
+    name: test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node: [20, 22]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
+
+      - name: npm install
+        run: npm ci
+
+      - name: test
+        run: npm test
