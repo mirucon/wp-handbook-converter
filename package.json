@@ -13,16 +13,17 @@
   "private": false,
   "scripts": {
     "lint": "prettier --check .",
-    "lint:fix": "prettier --write ."
+    "lint:fix": "prettier --write .",
+    "test": "vitest"
   },
   "dependencies": {
     "commander": "^14.0.0",
     "turndown": "^7.2.0",
-    "turndown-plugin-gfm": "^1.0.2",
-    "wpapi": "^1.2.2"
+    "turndown-plugin-gfm": "^1.0.2"
   },
   "devDependencies": {
-    "prettier": "3.6.2"
+    "prettier": "3.6.2",
+    "vitest": "^3.2.4"
   },
   "prettier": {
     "singleQuote": true,
