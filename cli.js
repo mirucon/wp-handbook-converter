@@ -124,10 +124,11 @@ turndownService.addRule('precode to code', {
 const getAll = async (url) => {
   let results = []
   const initialFetchUrl = `${url}?page=1&per_page=100`
+  const headers = {
+    'User-Agent': `wp-handbook-converter/${packageJson.version}`,
+  }
   const initialResponse = await fetch(initialFetchUrl, {
-    headers: {
-      'User-Agent': 'wp-handbook-converter/1.0.0',
-    },
+    headers,
   })
 
   if (!initialResponse.ok) {
@@ -146,9 +147,7 @@ const getAll = async (url) => {
     for (let page = 2; page <= totalPages; page++) {
       const fetchUrl = `${url}?page=${page}&per_page=100`
       const response = await fetch(fetchUrl, {
-        headers: {
-          'User-Agent': 'wp-handbook-converter/1.0.0',
-        },
+        headers,
       })
       if (!response.ok) {
         console.error(`Error fetching ${fetchUrl}`)
