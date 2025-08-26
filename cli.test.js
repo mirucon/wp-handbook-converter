@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { generateFiles } from './cli.js'
 import { rm, mkdir, writeFile, readFile } from 'fs/promises'
 import path from 'path'
+import themesHandbook from './themes-handbook.mock.json'
 
 // Mock fs/promises
 vi.mock('fs/promises', () => ({
@@ -140,6 +141,8 @@ describe('generateFiles', () => {
         }
         return Promise.reject({ code: 'ENOENT' });
     });
+
+
     await generateFiles('cli', 'handbook', 'make', 'en', false)
 
     expect(writeFile).toHaveBeenCalledTimes(1)
@@ -149,6 +152,52 @@ describe('generateFiles', () => {
         finalPath2,
         '# Installing\n\n## How to install',
         { encoding: 'utf8' },
+    )
+  })
+})
+
+describe('generateFiles for themes handbook', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    readFile.mockRejectedValue({ code: 'ENOENT' })
+  })
+
+  it('should correctly generate files for the themes handbook', async () => {
+    global.fetch = vi.fn((url) => {
+      if (url.includes('page=1')) {
+        return Promise.resolve({
+          ok: true,
+          headers: new Map([['x-wp-totalpages', '1']]),
+          json: () => Promise.resolve(themesHandbook),
+        })
+      }
+      return Promise.resolve({
+        ok: true,
+        headers: new Map([['x-wp-totalpages', '1']]),
+        json: () => Promise.resolve([]),
+      })
+    })
+
+    await generateFiles('themes', 'handbook', 'make', 'en-themes', false)
+
+    expect(writeFile).toHaveBeenCalled()
+    // A basic assertion to ensure files are being created.
+    // A more thorough test would check every file, but that would be very verbose.
+    expect(writeFile.mock.calls.length).toBe(themesHandbook.length)
+
+    // Check a nested file to ensure directory creation is working
+    const nestedFile = themesHandbook.find(p => p.link.includes('review/theme-suspension'))
+    const rootItem = themesHandbook.find((item) => parseInt(item.parent) === 0)
+    const rootPath = rootItem.link.split(rootItem.slug)[0]
+    const expectedItemPath = nestedFile.link.split(rootPath)[1].replace(/\/$/, '')
+    const finalPath = path.join('en-themes', `${expectedItemPath}.md`)
+    const dirForFile = path.dirname(finalPath)
+
+    expect(mkdir).toHaveBeenCalledWith(dirForFile, { recursive: true })
+    expect(writeFile).toHaveBeenCalledWith(
+      finalPath,
+      expect.any(String),
+      expect.any(Object)
     )
   })
 })
