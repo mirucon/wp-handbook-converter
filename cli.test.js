@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { generateFiles } from './cli.js'
 import { rm, mkdir, writeFile, readFile } from 'fs/promises'
 import path from 'path'
-import themesHandbook from './themes-handbook.mock.json'
 
 // Mock fs/promises
 vi.mock('fs/promises', () => ({
@@ -154,50 +153,60 @@ describe('generateFiles', () => {
         { encoding: 'utf8' },
     )
   })
-})
 
-describe('generateFiles for themes handbook', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    readFile.mockRejectedValue({ code: 'ENOENT' })
-  })
+  it('should handle nested files correctly', async () => {
+    const nestedMockPosts = [
+      {
+        id: 1,
+        parent: 0,
+        slug: 'handbook',
+        link: 'https://make.wordpress.org/themes/handbook/',
+        title: { rendered: 'Themes Handbook' },
+        content: { rendered: '<p>Welcome</p>' },
+      },
+      {
+        id: 2,
+        parent: 1,
+        slug: 'review',
+        link: 'https://make.wordpress.org/themes/handbook/review/',
+        title: { rendered: 'Review' },
+        content: { rendered: '<p>Review process</p>' },
+      },
+      {
+        id: 3,
+        parent: 2,
+        slug: 'required',
+        link: 'https://make.wordpress.org/themes/handbook/review/required/',
+        title: { rendered: 'Required' },
+        content: { rendered: '<p>All requirements</p>' },
+      },
+    ];
 
-  it('should correctly generate files for the themes handbook', async () => {
     global.fetch = vi.fn((url) => {
-      if (url.includes('page=1')) {
-        return Promise.resolve({
-          ok: true,
-          headers: new Map([['x-wp-totalpages', '1']]),
-          json: () => Promise.resolve(themesHandbook),
-        })
-      }
       return Promise.resolve({
         ok: true,
         headers: new Map([['x-wp-totalpages', '1']]),
-        json: () => Promise.resolve([]),
-      })
-    })
+        json: () => Promise.resolve(nestedMockPosts),
+      });
+    });
 
-    await generateFiles('themes', 'handbook', 'make', 'en-themes', false)
+    await generateFiles('themes', 'handbook', 'make', 'en-nested', false)
 
-    expect(writeFile).toHaveBeenCalled()
-    // A basic assertion to ensure files are being created.
-    // A more thorough test would check every file, but that would be very verbose.
-    expect(writeFile.mock.calls.length).toBe(themesHandbook.length)
+    expect(writeFile).toHaveBeenCalledTimes(3);
 
-    // Check a nested file to ensure directory creation is working
-    const nestedFile = themesHandbook.find(p => p.link.includes('review/theme-suspension'))
-    const rootItem = themesHandbook.find((item) => parseInt(item.parent) === 0)
+    const rootItem = nestedMockPosts.find((item) => parseInt(item.parent) === 0)
     const rootPath = rootItem.link.split(rootItem.slug)[0]
-    const expectedItemPath = nestedFile.link.split(rootPath)[1].replace(/\/$/, '')
-    const finalPath = path.join('en-themes', `${expectedItemPath}.md`)
-    const dirForFile = path.dirname(finalPath)
 
-    expect(mkdir).toHaveBeenCalledWith(dirForFile, { recursive: true })
-    expect(writeFile).toHaveBeenCalledWith(
-      finalPath,
-      expect.any(String),
-      expect.any(Object)
-    )
-  })
+    const expectedItemPath1 = nestedMockPosts[0].link.split(rootPath)[1].replace(/\/$/, '')
+    const finalPath1 = path.join('en-nested', `${expectedItemPath1}.md`)
+    expect(writeFile).toHaveBeenCalledWith(finalPath1, '# Themes Handbook\n\nWelcome', { encoding: 'utf8' });
+
+    const expectedItemPath2 = nestedMockPosts[1].link.split(rootPath)[1].replace(/\/$/, '')
+    const finalPath2 = path.join('en-nested', `${expectedItemPath2}.md`)
+    expect(writeFile).toHaveBeenCalledWith(finalPath2, '# Review\n\nReview process', { encoding: 'utf8' });
+
+    const expectedItemPath3 = nestedMockPosts[2].link.split(rootPath)[1].replace(/\/$/, '')
+    const finalPath3 = path.join('en-nested', `${expectedItemPath3}.md`)
+    expect(writeFile).toHaveBeenCalledWith(finalPath3, '# Required\n\nAll requirements', { encoding: 'utf8' });
+  });
 })
