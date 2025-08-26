@@ -140,8 +140,6 @@ describe('generateFiles', () => {
         }
         return Promise.reject({ code: 'ENOENT' });
     });
-
-
     await generateFiles('cli', 'handbook', 'make', 'en', false)
 
     expect(writeFile).toHaveBeenCalledTimes(1)
