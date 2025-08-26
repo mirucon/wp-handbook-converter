@@ -3,7 +3,7 @@
 import { readFile, writeFile, mkdir, rm } from 'fs/promises'
 import { program } from 'commander'
 import TurndownService from 'turndown'
-import WPAPI from 'wpapi'
+import path from 'path'
 import { tables } from 'turndown-plugin-gfm'
 import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
@@ -121,12 +121,44 @@ turndownService.addRule('precode to code', {
   },
 })
 
-const getAll = async (request) => {
-  let response = await request
-  while (response._paging && response._paging.next) {
-    response = response.concat(await response._paging.next)
+const getAll = async (url) => {
+  let results = []
+  const initialFetchUrl = `${url}?page=1&per_page=100`
+  const headers = {
+    'User-Agent': `wp-handbook-converter/${packageJson.version}`,
   }
-  return response
+  const initialResponse = await fetch(initialFetchUrl, {
+    headers,
+  })
+
+  if (!initialResponse.ok) {
+    console.error(`Error fetching ${initialFetchUrl}`)
+    throw new Error(`HTTP error! status: ${initialResponse.status}`)
+  }
+
+  const totalPages = parseInt(
+    initialResponse.headers.get('x-wp-totalpages'),
+    10,
+  )
+  const initialData = await initialResponse.json()
+  results = results.concat(initialData)
+
+  if (totalPages > 1) {
+    for (let page = 2; page <= totalPages; page++) {
+      const fetchUrl = `${url}?page=${page}&per_page=100`
+      const response = await fetch(fetchUrl, {
+        headers,
+      })
+      if (!response.ok) {
+        console.error(`Error fetching ${fetchUrl}`)
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = await response.json()
+      results = results.concat(data)
+    }
+  }
+
+  return results
 }
 
 export const generateFiles = async (
@@ -141,7 +173,7 @@ export const generateFiles = async (
   subdomain = `${
     subdomain ? (subdomain === 'w.org' ? '' : subdomain) : 'make'
   }.`
-  outputDir = outputDir ? outputDir.replace(/\/$/, '') + '/' : 'en/'
+  outputDir = outputDir || 'en/'
 
   if (regenerate) {
     // Remove the output directory first if -r option is set.
@@ -158,17 +190,10 @@ export const generateFiles = async (
     throw e
   }
 
-  const wp = new WPAPI({
-    endpoint: `https://${subdomain}wordpress.org/${team}wp-json`,
-  })
+  const url = `https://${subdomain}wordpress.org/${team}wp-json/wp/v2/${handbook}`
+  console.log(`Connecting to ${url}`)
 
-  wp.handbooks = wp.registerRoute('wp/v2', `/${handbook}/(?P<id>)`)
-
-  console.log(
-    `Connecting to https://${subdomain}wordpress.org/${team}wp-json/wp/v2/${handbook}/`,
-  )
-
-  const allPosts = await getAll(wp.handbooks())
+  const allPosts = await getAll(url)
 
   if (allPosts.length === 0) {
     console.warn('No posts found.')
@@ -185,40 +210,38 @@ export const generateFiles = async (
 
   for (const item of allPosts) {
     const pathSegment = item.link.split(rootPath)[1]
-    const path =
+    const itemPath =
       (pathSegment === undefined ? item.slug : pathSegment).replace(
         /\/$/,
         '',
       ) || 'index'
-    const filePath =
-      path.split('/').length > 1
-        ? path.substring(0, path.lastIndexOf('/')) + '/'
-        : ''
 
     const content = item.content.rendered
     const markdownContent = turndownService.turndown(content)
     const markdown = `# ${item.title.rendered}\n\n${markdownContent}`
+    const finalPath = path.join(outputDir, `${itemPath}.md`)
+    const dirForFile = path.dirname(finalPath)
 
     try {
-      await mkdir(`${outputDir}/${filePath}`, { recursive: true })
-      const existingContent = await readFile(`${outputDir}/${path}.md`, 'utf8')
+      await mkdir(dirForFile, { recursive: true })
+      const existingContent = await readFile(finalPath, 'utf8')
       if (existingContent === markdown) {
         console.log(
           '\x1b[37m%s\x1b[0m',
-          `${path}.md already exists with the exact same content. Skipping...`,
+          `${itemPath}.md already exists with the exact same content. Skipping...`,
         )
       } else {
-        await writeFile(`${outputDir}/${path}.md`, markdown, {
+        await writeFile(finalPath, markdown, {
           encoding: 'utf8',
         })
-        console.log(`Updated ${path}.md`)
+        console.log(`Updated ${itemPath}.md`)
       }
     } catch (e) {
       if (e.code === 'ENOENT') {
-        await writeFile(`${outputDir}/${path}.md`, markdown, {
+        await writeFile(finalPath, markdown, {
           encoding: 'utf8',
         })
-        console.log(`Created ${path}.md`)
+        console.log(`Created ${itemPath}.md`)
       } else {
         console.error(
           'An error occurred during saving files. Please try again.',
