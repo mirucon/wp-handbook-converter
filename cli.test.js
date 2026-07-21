@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { generateFiles } from './cli.js'
 import { rm, mkdir, writeFile, readFile } from 'fs/promises'
 import path from 'path'
@@ -16,6 +16,15 @@ describe('generateFiles', () => {
     vi.clearAllMocks()
     // Reset the readFile mock to its default behavior for each test
     readFile.mockRejectedValue({ code: 'ENOENT' })
+
+    // Mock console methods
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   const mockPosts = [
