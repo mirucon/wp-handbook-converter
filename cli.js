@@ -6,6 +6,7 @@ import TurndownService from 'turndown'
 import path from 'path'
 import { tables } from 'turndown-plugin-gfm'
 import { createRequire } from 'module'
+import { fileURLToPath } from 'url'
 const require = createRequire(import.meta.url)
 const packageJson = require('./package.json')
 
@@ -254,7 +255,7 @@ export const generateFiles = async (
 
 program
   .version(packageJson.version)
-  .description('Generate a menu JSON file for WordPress.org handbook')
+  .description('Convert WordPress handbook pages into markdown files')
   .option('-t, --team <team>', 'Specify team name')
   .option(
     '-b, --handbook <handbook>',
@@ -265,16 +266,16 @@ program
     'Specify subdomain, for example, "developer" for developer.w.org, "w.org" for w.org (default "make")',
   )
   .option(
-    '-o --output-dir <outputDir>',
+    '-o, --output-dir <outputDir>',
     'Specify directory to save files (default en/)',
   )
   .option(
-    '-r --regenerate',
+    '-r, --regenerate',
     'If this option is supplied, the directory you specified as output directory will once deleted, and it will regenerate all the files in the directory',
   )
   .allowExcessArguments()
   .action((options) => {
-    generateFiles(
+    return generateFiles(
       options.team,
       options.handbook,
       options.subDomain,
@@ -283,4 +284,10 @@ program
     )
   })
 
-program.parse(process.argv)
+const isDirectRun =
+  Boolean(process.argv[1]) &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+
+if (isDirectRun) {
+  await program.parseAsync(process.argv)
+}

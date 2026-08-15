@@ -7,3 +7,6 @@ en/
 ## Exclude possible output directories ##
 *handbook/
 *organizer/
+
+.github/
+renovate.json

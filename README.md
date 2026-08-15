@@ -14,13 +14,15 @@ $ npm i -g wp-handbook-converter
 
 If you want to run the command without installing the package, use this: `$ npx wp-handbook-converter`
 
+Requires Node.js 22.12 or later.
+
 ## `wp-handbook-converter` command options
 
 - `-t, --team` &lt;team&gt; Specify team name.
 - `-b, --handbook` &lt;handbook&gt; Specify handbook name. (Default "handbook")
 - `-s, --sub-domain` &lt;sub-domain&gt; Specify subdomain name. e.g. "developer" for developer.w.org, "w.org" for w.org (Default "make")
 - `-o, --output-dir` &lt;output-dir&gt; Specify the directory to save files (default `en/`)
-- `-r, --regenerate` &lt;regenerate&gt; If this option is supplied, the directory you specified as output directory will once deleted, and it will regenerate all the files in the directory
+- `-r, --regenerate` If this option is supplied, the directory you specified as output directory will once deleted, and it will regenerate all the files in the directory
 
 ### Example
 
@@ -62,4 +64,10 @@ You can automatically fix linting errors by running:
 
 ```bash
 npm run lint:fix
+```
+
+### Testing
+
+```bash
+npm test
 ```
